@@ -5,6 +5,7 @@ import MonGuardClient from '@monguard/sdk';
 import TransactionGraph from '../src/components/TransactionGraph';
 import RiskMetrics from '../src/components/RiskMetrics';
 import AlertsPanel from '../src/components/AlertsPanel';
+import WalletConnect from '../src/components/WalletConnect';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { 
@@ -375,6 +376,15 @@ interface TopbarProps {
 export function Topbar({ onMenuClick, client }: TopbarProps) {
   const [showNotifications, setShowNotifications] = useState(false);
 
+  const handleWalletConnect = (account: any, smartAccount: any) => {
+    console.log('Wallet connected:', account);
+    console.log('Smart account:', smartAccount);
+  };
+
+  const handleWalletDisconnect = () => {
+    console.log('Wallet disconnected');
+  };
+
   return (
     <header className="sticky top-0 z-30 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-gray-200 dark:border-gray-800 shadow-sm">
       <div className="px-4 sm:px-6 lg:px-8 py-4">
@@ -401,46 +411,34 @@ export function Topbar({ onMenuClick, client }: TopbarProps) {
 
           {/* Right: Actions */}
           <div className="flex items-center gap-3">
-            {/* Network Badge */}
-            <Badge variant="secondary" className="gap-1.5 hidden sm:flex bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800">
-              <Activity className="h-3 w-3" />
-              Monad
-            </Badge>
+            {/* Wallet Connect Component */}
+            <WalletConnect 
+              onConnect={handleWalletConnect}
+              onDisconnect={handleWalletDisconnect}
+            />
 
             {/* Notifications */}
             <motion.button
-  whileHover={{ scale: 1.05 }}
-  whileTap={{ scale: 0.95 }}
-  className="relative p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
-  onClick={() => setShowNotifications(!showNotifications)}
->
-  <Bell className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-  <span className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full border-2 border-white dark:border-slate-900" />
-
-  <AnimatePresence>
-    {showNotifications && (
-      <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -10 }}
-        className="absolute right-0 mt-2 w-80 bg-white dark:bg-slate-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 z-50"
-      >
-        <AlertsPanel client={client ?? null} />
-      </motion.div>
-    )}
-  </AnimatePresence>
-</motion.button>
-
-
-            {/* User Avatar */}
-            <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="flex items-center gap-2 p-1.5 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-xl transition-colors"
+              className="relative p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+              onClick={() => setShowNotifications(!showNotifications)}
             >
-              <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
-                <User className="h-4 w-4 text-white" />
-              </div>
+              <Bell className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+              <span className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full border-2 border-white dark:border-slate-900" />
+
+              <AnimatePresence>
+                {showNotifications && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="absolute right-0 mt-2 w-80 bg-white dark:bg-slate-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 z-50"
+                  >
+                    <AlertsPanel client={client ?? null} />
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </motion.button>
           </div>
         </div>
