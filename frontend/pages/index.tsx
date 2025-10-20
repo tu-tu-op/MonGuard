@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import MonGuardClient from '@monguard/sdk';
 import TransactionGraph from '../src/components/TransactionGraph';
 import RiskMetrics from '../src/components/RiskMetrics';
@@ -28,7 +28,7 @@ export default function Dashboard() {
   const [client, setClient] = useState<MonGuardClient | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [stats, setStats] = useState({
-    totalTransactions: 0,
+    totalTransactions: 1,
     flaggedTransactions: 0,
     highRiskWallets: 0,
     activeAlerts: 0
@@ -99,7 +99,7 @@ export default function Dashboard() {
         {/* Main Content Area */}
         <div className={`transition-all duration-300 ${sidebarOpen ? 'lg:ml-64' : 'lg:ml-20'}`}>
           {/* Top Bar */}
-          <Topbar onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
+          <Topbar onMenuClick={() => setSidebarOpen(!sidebarOpen)} client={client} />
 
           {/* Main Content */}
           <main className="px-4 sm:px-6 lg:px-8 py-8 space-y-8">
@@ -175,7 +175,7 @@ export default function Dashboard() {
               </Card>
 
               {/* Alerts Panel */}
-              <Card className="lg:col-span-1 border-none shadow-xl bg-white/70 dark:bg-slate-900/70 backdrop-blur-md hover:shadow-2xl transition-all duration-300 rounded-2xl overflow-hidden">
+              <Card id= "alerts"className="lg:col-span-1 border-none shadow-xl bg-white/70 dark:bg-slate-900/70 backdrop-blur-md hover:shadow-2xl transition-all duration-300 rounded-2xl overflow-hidden">
                 <CardHeader className="border-b border-gray-100 dark:border-gray-800 bg-gradient-to-r from-red-50/50 to-orange-50/50 dark:from-red-950/20 dark:to-orange-950/20">
                   <CardTitle className="text-2xl font-bold">Recent Alerts</CardTitle>
                   <CardDescription className="text-gray-600 dark:text-gray-400">
@@ -183,13 +183,14 @@ export default function Dashboard() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="p-6">
-                  <AlertsPanel client={client} />
+                  <AlertsPanel client={client ?? null} />
                 </CardContent>
               </Card>
             </motion.div>
 
             {/* Risk Metrics */}
             <motion.div
+              id="analytics"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.6 }}
@@ -221,11 +222,22 @@ interface SidebarProps {
 
 function Sidebar({ isOpen, onToggle }: SidebarProps) {
   const navItems = [
-    { icon: Home, label: 'Dashboard', active: true },
-    { icon: AlertTriangle, label: 'Alerts', active: false },
-    { icon: BarChart3, label: 'Analytics', active: false },
-    { icon: Settings, label: 'Settings', active: false },
+     { icon: Home, label: 'Dashboard', target: 'top' },
+    { icon: AlertTriangle, label: 'Alerts', target: 'alerts' },
+    { icon: BarChart3, label: 'Analytics', target: 'analytics' },
+    { icon: Settings, label: 'Settings', target: 'settings' },
   ];
+
+  const handleNavClick = (target: string) => {
+    const el = document.getElementById(target);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+    // Close sidebar on mobile after click
+    if (window.innerWidth < 1024) {
+      onToggle();
+    }
+  };
 
   return (
     <>
@@ -276,28 +288,20 @@ function Sidebar({ isOpen, onToggle }: SidebarProps) {
 
           {/* Navigation */}
           <nav className="flex-1 p-4 space-y-2">
-            {navItems.map((item, index) => (
-              <motion.button
-                key={item.label}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
-                  item.active
-                    ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/30'
-                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800'
-                }`}
-              >
-                <item.icon className={`h-5 w-5 ${item.active ? '' : 'group-hover:scale-110 transition-transform'}`} />
-                {isOpen && (
-                  <span className="font-medium">{item.label}</span>
-                )}
-                {isOpen && item.active && (
-                  <ChevronRight className="h-4 w-4 ml-auto" />
-                )}
-              </motion.button>
-            ))}
-          </nav>
+        {navItems.map((item, index) => (
+          <motion.button
+            key={item.label}
+            onClick={() => handleNavClick(item.target)} // 👈 hook
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: index * 0.1 }}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl ...`}
+          >
+            <item.icon className="h-5 w-5" />
+            {isOpen && <span className="font-medium">{item.label}</span>}
+          </motion.button>
+        ))}
+      </nav>
 
           {/* Network Status */}
           {isOpen && (
@@ -311,7 +315,7 @@ function Sidebar({ isOpen, onToggle }: SidebarProps) {
                   <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
                   <span className="text-xs font-semibold text-green-700 dark:text-green-400">Network Active</span>
                 </div>
-                <p className="text-xs text-gray-600 dark:text-gray-400">Monad Mainnet</p>
+                <p className="text-xs text-gray-600 dark:text-gray-400">Monad Testnet</p>
               </div>
             </motion.div>
           )}
@@ -348,11 +352,7 @@ function Sidebar({ isOpen, onToggle }: SidebarProps) {
             {navItems.map((item) => (
               <button
                 key={item.label}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
-                  item.active
-                    ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg'
-                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800'
-                }`}
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800"
               >
                 <item.icon className="h-5 w-5" />
                 <span className="font-medium">{item.label}</span>
@@ -368,9 +368,13 @@ function Sidebar({ isOpen, onToggle }: SidebarProps) {
 // Topbar Component
 interface TopbarProps {
   onMenuClick: () => void;
+  client?: MonGuardClient | null;
 }
 
-function Topbar({ onMenuClick }: TopbarProps) {
+
+export function Topbar({ onMenuClick, client }: TopbarProps) {
+  const [showNotifications, setShowNotifications] = useState(false);
+
   return (
     <header className="sticky top-0 z-30 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-gray-200 dark:border-gray-800 shadow-sm">
       <div className="px-4 sm:px-6 lg:px-8 py-4">
@@ -405,13 +409,28 @@ function Topbar({ onMenuClick }: TopbarProps) {
 
             {/* Notifications */}
             <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="relative p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
-            >
-              <Bell className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-              <span className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full border-2 border-white dark:border-slate-900" />
-            </motion.button>
+  whileHover={{ scale: 1.05 }}
+  whileTap={{ scale: 0.95 }}
+  className="relative p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+  onClick={() => setShowNotifications(!showNotifications)}
+>
+  <Bell className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+  <span className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full border-2 border-white dark:border-slate-900" />
+
+  <AnimatePresence>
+    {showNotifications && (
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -10 }}
+        className="absolute right-0 mt-2 w-80 bg-white dark:bg-slate-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 z-50"
+      >
+        <AlertsPanel client={client ?? null} />
+      </motion.div>
+    )}
+  </AnimatePresence>
+</motion.button>
+
 
             {/* User Avatar */}
             <motion.button
