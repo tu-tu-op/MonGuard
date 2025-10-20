@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/adish/OneDrive/Documents/monad/contracts/scripts/**)",
+      "Read(//c/Users/adish/OneDrive/Documents/monad/contracts/**)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

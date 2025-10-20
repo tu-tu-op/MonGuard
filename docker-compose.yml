@@ -1,0 +1,81 @@
+version: '3.8'
+
+services:
+  # MonGuard API
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - NODE_ENV=production
+      - PORT=8000
+      - MONGODB_URI=mongodb://mongo:27017/monguard
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - mongo
+      - redis
+    volumes:
+      - ./api:/app
+      - /app/node_modules
+    restart: unless-stopped
+
+  # MongoDB
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    restart: unless-stopped
+
+  # Redis
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+
+  # Frontend Dashboard
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=http://api:8000
+    depends_on:
+      - api
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    restart: unless-stopped
+
+  # ML Engine (optional - for batch processing)
+  ml-engine:
+    build:
+      context: ./ml-engine
+      dockerfile: Dockerfile
+    environment:
+      - PYTHONUNBUFFERED=1
+      - WEB3_PROVIDER_URL=${WEB3_PROVIDER_URL}
+    volumes:
+      - ./ml-engine:/app
+      - ml-models:/app/models
+    restart: unless-stopped
+
+volumes:
+  mongo-data:
+  redis-data:
+  ml-models:
+
+networks:
+  default:
+    name: monguard-network

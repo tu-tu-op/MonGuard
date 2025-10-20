@@ -1,0 +1,18 @@
+{
+  "network": "hardhat",
+  "chainId": 31337,
+  "deployer": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+  "timestamp": "2025-10-17T17:49:29.802Z",
+  "contracts": {
+    "RiskRegistry": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+    "ComplianceOracle": "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
+    "TransactionMonitor": "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
+    "RegulatoryNFT": "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9",
+    "ComplianceEnforcement": "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9"
+  },
+  "roles": {
+    "ORACLE_ROLE": "0x68e79a7bf1e0bc45d0a330c573bc367f9cf464fd326078812f301165fbda4ef1",
+    "AI_ORACLE_ROLE": "0x482648e7878e9fa54c0a2f67ffd22d00ebc37cf7a03e060e428d2ab0cd6735cc",
+    "ENFORCER_ROLE": "0x973ef39d76cc2c6090feab1c030bec6ab5db557f64df047a4c4f9b5953cf1df3"
+  }
+}

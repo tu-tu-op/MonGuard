@@ -1,0 +1,85 @@
+# Dependencies
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.venv
+pip-log.txt
+pip-delete-this-directory.txt
+.pytest_cache/
+*.egg-info/
+dist/
+build/
+
+# ML Models
+*.pt
+*.pth
+*.h5
+*.pkl
+*.joblib
+ml-engine/checkpoints/
+ml-engine/runs/
+ml-engine/data/raw/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Smart Contracts
+contracts/artifacts/
+contracts/cache/
+contracts/typechain/
+contracts/typechain-types/
+coverage/
+coverage.json
+.openzeppelin/
+
+# Environment
+.env
+.env.local
+.env.*.local
+*.key
+secrets/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Frontend
+frontend/.next/
+frontend/out/
+frontend/build/
+frontend/.turbo
+
+# API
+api/uploads/
+api/temp/
+
+# Testing
+.nyc_output/
+htmlcov/
+
+# Documentation
+docs/_build/
+
+# Temp files
+*.tmp
+*.temp
+.cache/

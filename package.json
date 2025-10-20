@@ -1,0 +1,39 @@
+{
+  "name": "monguard",
+  "version": "1.0.0",
+  "description": "AI-Powered On-Chain Compliance & AML Analytics on Monad",
+  "private": true,
+  "workspaces": [
+    "contracts",
+    "sdk/js",
+    "api",
+    "frontend"
+  ],
+  "scripts": {
+    "contracts:compile": "cd contracts && npm run compile",
+    "contracts:test": "cd contracts && npm run test",
+    "contracts:deploy": "cd contracts && npm run deploy",
+    "ml:train": "cd ml-engine && python -m training.train_risk_model",
+    "ml:test": "cd ml-engine && pytest",
+    "api:dev": "cd api && npm run dev",
+    "api:start": "cd api && npm start",
+    "frontend:dev": "cd frontend && npm run dev",
+    "frontend:build": "cd frontend && npm run build",
+    "dev": "concurrently \"npm run api:dev\" \"npm run frontend:dev\"",
+    "test": "npm run contracts:test && npm run ml:test"
+  },
+  "keywords": [
+    "blockchain",
+    "monad",
+    "compliance",
+    "aml",
+    "regtech",
+    "ai",
+    "defi"
+  ],
+  "author": "MonGuard Team",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
